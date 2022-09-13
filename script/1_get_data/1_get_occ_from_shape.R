@@ -5,15 +5,14 @@ library(proj4)
 library(data.table)
 library(rgdal)
 library(dplyr)
+library(tidyr)
 library(raster)
 
 
 #read shape file from CAFF
 shpfile = "b_join_river_country.shp"
 #read downloaded GBIF csv file as data frame
-gbif = fread("occurrence.txt", sep = "\t",header = TRUE, na.strings = "\\N")
-
-library(tidyr)
+gbif = fread("0011743-220831081235567.txt", sep = "\t",header = TRUE, na.strings = "\\N")
 gbif = gbif |> 
   drop_na(c(decimalLatitude, decimalLongitude, gbifID)) |> 
   dplyr::select(decimalLatitude, decimalLongitude, gbifID) |> 
