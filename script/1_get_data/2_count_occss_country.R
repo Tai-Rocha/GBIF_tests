@@ -63,7 +63,7 @@ joined = country_shape |>
   
 
 
-write.csv(joined, "data/shape/Odonata_GBIF_ALL/255_Odonata_GBIF.csv")
+write.csv(joined, "results/Odonata/255_Odonata_GBIF.csv")
 
 
 
