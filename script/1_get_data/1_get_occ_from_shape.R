@@ -10,9 +10,12 @@ library(raster)
 
 
 #read shape file from CAFF
-shpfile = "b_join_river_country.shp"
+shp = "b_join_river_country.shp"
+
+# Odonata
+
 #read downloaded GBIF csv file as data frame
-gbif = fread("0011743-220831081235567.txt", sep = "\t",header = TRUE, na.strings = "\\N")
+gbif = fread("data-raw/odonata/0011743-220831081235567.txt", sep = "\t",header = TRUE, na.strings = "\\N")
 gbif = gbif |> 
   drop_na(c(decimalLatitude, decimalLongitude, gbifID)) |> 
   dplyr::select(decimalLatitude, decimalLongitude, gbifID) |> 
@@ -62,4 +65,216 @@ occurrence.from.shapefile <- function(shapefile, occurrence_df, lat, lon, gbifid
   return(final.gbif)
 }  
 
-rr <- occurrence.from.shapefile(shpfile, gbif, 'decimalLatitude', 'decimalLongitude', 'gbifid', mkplot = TRUE)
+odonata = occurrence.from.shapefile(shp, gbif, 'decimalLatitude', 'decimalLongitude', 'gbifid', mkplot = TRUE)
+
+# write
+
+rm(list=ls())
+
+# Rotifera
+
+#read downloaded GBIF csv file as data frame
+gbif = fread("data-raw/rotifera/0011303-220831081235567.csv", sep = ",",header = TRUE, na.strings = "\\N")
+gbif = gbif |> 
+  drop_na(c(decimalLatitude, decimalLongitude, gbifID)) |> 
+  dplyr::select(decimalLatitude, decimalLongitude, gbifID) |> 
+  dplyr::rename(gbifid = gbifID)
+
+#'Filter georeferenced records by shapefile
+#'
+#' @param shapefile A shapefile object (.shp)
+#' @param occurrence_df A data frame of georeferenced records. For large csv use fread()
+#' @param lat The column name for latitude in the data frame
+#' @param lon The column name for longitude in the data frame
+#' @param gbifid A unique record key
+#' @param map_crs The datum assigned to the occurrence data frame
+#' @param mkplot Whether to draw the map plots. Can be very expensive
+#'Filter georeferenced records by shapefile
+#'
+#' @param shapefile A shapefile object (.shp)
+#' @param occurrence_df A data frame of georeferenced records. For large csv use fread()
+#' @param lat The column name for latitude in the data frame
+#' @param lon The column name for longitude in the data frame
+#' @param gbifid A unique record key
+#' @param map_crs The datum assigned to the occurrence data frame
+#' @param mkplot Whether to draw the map plots. Can be very expensive
+occurrence.from.shapefile <- function(shapefile, occurrence_df, lat, lon, gbifid, map_crs = "+proj=longlat +datum=WGS84", mkplot = FALSE){
+  
+  shape <- readOGR(shapefile)
+  print(proj4string(shape))
+  
+  #subset the GBIF data into a data frame
+  occ.map <- data.frame(occurrence_df[[lon]], occurrence_df[[lat]], occurrence_df[[gbifid]])
+  print(str(occ.map, 1))
+  #simplify column names
+  names(occ.map)[1:3] <- c("long", "lat", "gbifid")
+  print(head(occ.map, 10))
+  #turning the data frame into a "spatial points data frame"
+  coordinates(occ.map) <- c("long", "lat")
+  #defining the datum 
+  proj4string(occ.map) <- CRS(map_crs)
+  #reprojecting the 'gbif' data frame to the same as in the 'shape' object 
+  occ.map <- spTransform(occ.map, proj4string(shape))
+  
+  #Identifying records from gbif that fall within the shape polygons
+  inside <- occ.map[apply(gIntersects(occ.map, shape, byid = TRUE), 2, any),]
+  print(mkplot)
+  if(mkplot){
+    raster::plot(shape)
+    points(inside, col = "olivedrab3")
+  }  
+  
+  #Prepare data frame for joining with the occcurrence df so only records 
+  #that fall inside the polygons get selected 
+  res.gbif <- data.frame(inside@data)
+  final.gbif <- gbif %>% semi_join(res.gbif, by = c(gbifid = "gbifid"))
+  
+  #write.csv(final.gbif, file = "gbif_records_by_shapefile.csv", sep = "\t", col.names = FALSE)
+  return(final.gbif)
+}  
+
+
+rotifera = occurrence.from.shapefile(shp, gbif, 'decimalLatitude', 'decimalLongitude', 'gbifid', mkplot = TRUE)
+
+# write
+
+rm(list=ls())
+
+# Bivalvia
+
+#read downloaded GBIF csv file as data frame
+gbif = fread("data-raw/bivalvia/0166864-220831081235567.csv", sep = "\t",header = TRUE, na.strings = "\\N")
+gbif = gbif |> 
+  drop_na(c(decimalLatitude, decimalLongitude, gbifID)) |> 
+  dplyr::select(decimalLatitude, decimalLongitude, gbifID) |> 
+  dplyr::rename(gbifid = gbifID)
+
+#'Filter georeferenced records by shapefile
+#'
+#' @param shapefile A shapefile object (.shp)
+#' @param occurrence_df A data frame of georeferenced records. For large csv use fread()
+#' @param lat The column name for latitude in the data frame
+#' @param lon The column name for longitude in the data frame
+#' @param gbifid A unique record key
+#' @param map_crs The datum assigned to the occurrence data frame
+#' @param mkplot Whether to draw the map plots. Can be very expensive
+#'Filter georeferenced records by shapefile
+#'
+#' @param shapefile A shapefile object (.shp)
+#' @param occurrence_df A data frame of georeferenced records. For large csv use fread()
+#' @param lat The column name for latitude in the data frame
+#' @param lon The column name for longitude in the data frame
+#' @param gbifid A unique record key
+#' @param map_crs The datum assigned to the occurrence data frame
+#' @param mkplot Whether to draw the map plots. Can be very expensive
+occurrence.from.shapefile <- function(shapefile, occurrence_df, lat, lon, gbifid, map_crs = "+proj=longlat +datum=WGS84", mkplot = FALSE){
+  
+  shape <- readOGR(shapefile)
+  print(proj4string(shape))
+  
+  #subset the GBIF data into a data frame
+  occ.map <- data.frame(occurrence_df[[lon]], occurrence_df[[lat]], occurrence_df[[gbifid]])
+  print(str(occ.map, 1))
+  #simplify column names
+  names(occ.map)[1:3] <- c("long", "lat", "gbifid")
+  print(head(occ.map, 10))
+  #turning the data frame into a "spatial points data frame"
+  coordinates(occ.map) <- c("long", "lat")
+  #defining the datum 
+  proj4string(occ.map) <- CRS(map_crs)
+  #reprojecting the 'gbif' data frame to the same as in the 'shape' object 
+  occ.map <- spTransform(occ.map, proj4string(shape))
+  
+  #Identifying records from gbif that fall within the shape polygons
+  inside <- occ.map[apply(gIntersects(occ.map, shape, byid = TRUE), 2, any),]
+  print(mkplot)
+  if(mkplot){
+    raster::plot(shape)
+    points(inside, col = "olivedrab3")
+  }  
+  
+  #Prepare data frame for joining with the occcurrence df so only records 
+  #that fall inside the polygons get selected 
+  res.gbif <- data.frame(inside@data)
+  final.gbif <- gbif %>% semi_join(res.gbif, by = c(gbifid = "gbifid"))
+  
+  #write.csv(final.gbif, file = "gbif_records_by_shapefile.csv", sep = "\t", col.names = FALSE)
+  return(final.gbif)
+}  
+
+
+bivalvia = occurrence.from.shapefile(shp, gbif, 'decimalLatitude', 'decimalLongitude', 'gbifid', mkplot = FALSE)
+
+# write
+
+rm(list=ls())
+
+
+# Porifera
+
+#read downloaded GBIF csv file as data frame
+gbif = fread("data-raw/porifera/0166867-220831081235567.csv", sep = "\t",header = TRUE, na.strings = "\\N")
+gbif = gbif |> 
+  drop_na(c(decimalLatitude, decimalLongitude, gbifID)) |> 
+  dplyr::select(decimalLatitude, decimalLongitude, gbifID) |> 
+  dplyr::rename(gbifid = gbifID)
+
+#'Filter georeferenced records by shapefile
+#'
+#' @param shapefile A shapefile object (.shp)
+#' @param occurrence_df A data frame of georeferenced records. For large csv use fread()
+#' @param lat The column name for latitude in the data frame
+#' @param lon The column name for longitude in the data frame
+#' @param gbifid A unique record key
+#' @param map_crs The datum assigned to the occurrence data frame
+#' @param mkplot Whether to draw the map plots. Can be very expensive
+#'Filter georeferenced records by shapefile
+#'
+#' @param shapefile A shapefile object (.shp)
+#' @param occurrence_df A data frame of georeferenced records. For large csv use fread()
+#' @param lat The column name for latitude in the data frame
+#' @param lon The column name for longitude in the data frame
+#' @param gbifid A unique record key
+#' @param map_crs The datum assigned to the occurrence data frame
+#' @param mkplot Whether to draw the map plots. Can be very expensive
+occurrence.from.shapefile <- function(shapefile, occurrence_df, lat, lon, gbifid, map_crs = "+proj=longlat +datum=WGS84", mkplot = FALSE){
+  
+  shape <- readOGR(shapefile)
+  print(proj4string(shape))
+  
+  #subset the GBIF data into a data frame
+  occ.map <- data.frame(occurrence_df[[lon]], occurrence_df[[lat]], occurrence_df[[gbifid]])
+  print(str(occ.map, 1))
+  #simplify column names
+  names(occ.map)[1:3] <- c("long", "lat", "gbifid")
+  print(head(occ.map, 10))
+  #turning the data frame into a "spatial points data frame"
+  coordinates(occ.map) <- c("long", "lat")
+  #defining the datum 
+  proj4string(occ.map) <- CRS(map_crs)
+  #reprojecting the 'gbif' data frame to the same as in the 'shape' object 
+  occ.map <- spTransform(occ.map, proj4string(shape))
+  
+  #Identifying records from gbif that fall within the shape polygons
+  inside <- occ.map[apply(gIntersects(occ.map, shape, byid = TRUE), 2, any),]
+  print(mkplot)
+  if(mkplot){
+    raster::plot(shape)
+    points(inside, col = "olivedrab3")
+  }  
+  
+  #Prepare data frame for joining with the occcurrence df so only records 
+  #that fall inside the polygons get selected 
+  res.gbif <- data.frame(inside@data)
+  final.gbif <- gbif %>% semi_join(res.gbif, by = c(gbifid = "gbifid"))
+  
+  #write.csv(final.gbif, file = "gbif_records_by_shapefile.csv", sep = "\t", col.names = FALSE)
+  return(final.gbif)
+}  
+
+
+porifera = occurrence.from.shapefile(shp, gbif, 'decimalLatitude', 'decimalLongitude', 'gbifid', mkplot = FALSE)
+
+# write
+
+rm(list=ls())
