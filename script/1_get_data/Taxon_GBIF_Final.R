@@ -1690,17 +1690,17 @@ good_points = st_filter(gb, shp)
 
 #plot(st_geometry(good_points))
 
-cntshp = st_as_sf(countryshp, st_crs(4326))
-
+cntshp = st_as_sf(countryshp, st_crs(4326))  
+ 
 euglenozoajoin = st_join(cntshp, good_points) |> 
-  as_tibble()
+  as_tibble() 
 
 euglenozoa_n_sp = euglenozoajoin |>
   tidyr::drop_na(c(decimalLatitude, decimalLongitude, species, ISO_A2.x)) |> 
   dplyr::select(species, ISO_A2.x) |>
   dplyr::distinct(species, ISO_A2.x) |> 
   dplyr::group_by(species,ISO_A2.x) #|> 
-#raster::subset(ISO_A2.x != -99) 
+  #raster::subset(ISO_A2.x != -99) 
 
 euglenozoa_N_SPP = plyr::count(euglenozoa_n_sp$ISO_A2.x) 
 euglenozoa_N_SPP = dplyr::rename(euglenozoa_N_SPP, ISO_A2.x = x)
@@ -1715,22 +1715,47 @@ euglenozoa_N_OCC =  euglenozoa_N_SP |>
 
 ## Merge  
 
-euglenozoa_final = merge(euglenozoa_N_SP, euglenozoa_N_OCC, by= "ISO_A2.x")
-
-## Plot N species per country
-
-euglenozoaMap = st_as_sf(euglenozoa_final) |> 
+euglenozoa_final = merge(euglenozoa_N_SP, euglenozoa_N_OCC, by= "ISO_A2.x")  |> 
+  #dplyr::right_join(cntshp, by= "ADMIN") |> 
+  #replace(is.na(.), 0) |> 
+  #mutate_at(vars(freq:gbifID.y), ~replace(., is.na(.), 0)) 
+  #mutate_if(is.integer, ~replace(., is.na(.), 0)) |> 
+  #mutate_if(is.numeric, ~replace(., is.na(.), 0)) |> 
+  #mutate_if(is.character, ~replace(., is.na(.), 0)) |> 
+  #mutate_if(is.numeric, ~replace(., -99, 0))  |> 
   dplyr::rename(N_Species = gbifID.y) |> 
   dplyr::rename(N_Occurrences = freq)
 
+
+## Plot N species per country
+
+euglenozoaMap = euglenozoa_final  |> 
+  dplyr::select(ADMIN, N_Species,N_Occurrences)  
+ 
+euglenozoaMap2 = cntshp |> 
+  left_join(euglenozoaMap, by = "ADMIN") |> 
+  mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
+
+bbox_new = st_bbox(euglenozoaMap2) 
+xrange = bbox_new$xmax - bbox_new$xmin # range of x values
+yrange = bbox_new$ymax - bbox_new$ymin # range of y values
+
+# bbox_new[1] <- bbox_new[1] - (0.25 * xrange) # xmin - left
+bbox_new[3] <- bbox_new[3] + (0.20 * xrange) # xmax - right
+# bbox_new[2] <- bbox_new[2] - (0.25 * yrange) # ymin - bottom
+bbox_new[4] <- bbox_new[4] + (0.17 * yrange) # ymax - top
+
+bbox_new <- bbox_new %>%  # take the bounding box ...
+  st_as_sfc() # ... and make it a sf polygon
+
 png(file="Euglenozoa",
     width=9, height=7, units="in", res=300)
-tm_shape(euglenozoaMap) +
+tm_shape(euglenozoaMap2,  bbox = bbox_new) +
   tm_fill(c("N_Species", "N_Occurrences"), 
-          n = 5,
+          n = 4,
           style = "jenks",
           palette = 'Blues') +
-  tm_layout(legend.position = c("left", "bottom"),
+  tm_layout(legend.position = c("right", "bottom"),
             main.title = "Euglenozoa",
             main.title.position = "centre") +
   tm_borders(alpha = 0.5)
