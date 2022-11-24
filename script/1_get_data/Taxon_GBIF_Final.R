@@ -64,24 +64,39 @@ bivalvia_N_OCC =  bivalvia_N_SP |>
 
 ## Merge  
 
-bivalvia_final = merge(bivalvia_N_SP, bivalvia_N_OCC, by= "ISO_A2.x")
-
-#st_write(bivalvia_final, "results/bivalvia.shp")
-
-## Plot N species per country
-
-bivalviaMap = st_as_sf(bivalvia_final) |> 
+bivalvia_final = merge(bivalvia_N_SP, bivalvia_N_OCC, by= "ISO_A2.x") |> 
   dplyr::rename(N_Species = gbifID.y) |> 
   dplyr::rename(N_Occurrences = freq)
 
-png(file="Bivalvia.png",
+## Plot
+
+bivalviaMap = bivalvia_final  |> 
+  dplyr::select(ADMIN, N_Species,N_Occurrences)  
+
+bivalviaMap2 = cntshp |> 
+  left_join(bivalviaMap, by = "ADMIN") #|> 
+  #mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
+
+bbox_new = st_bbox(bivalviaMap2) 
+xrange = bbox_new$xmax - bbox_new$xmin # range of x values
+yrange = bbox_new$ymax - bbox_new$ymin # range of y values
+
+# bbox_new[1] <- bbox_new[1] - (0.25 * xrange) # xmin - left
+bbox_new[3] <- bbox_new[3] + (0.20 * xrange) # xmax - right
+# bbox_new[2] <- bbox_new[2] - (0.25 * yrange) # ymin - bottom
+bbox_new[4] <- bbox_new[4] + (0.17 * yrange) # ymax - top
+
+bbox_new <- bbox_new %>%  # take the bounding box ...
+  st_as_sfc() # ... and make it a sf polygon
+
+png(file="Bivalvia",
     width=9, height=7, units="in", res=300)
-tm_shape(bivalviaMap) +
+tm_shape(bivalviaMap2,  bbox = bbox_new) +
   tm_fill(c("N_Species", "N_Occurrences"), 
-          n = 5,
+          n = 4,
           style = "jenks",
           palette = 'Blues') +
-  tm_layout(legend.position = c("left", "bottom"),
+  tm_layout(legend.position = c("right", "bottom"),
             main.title = "Bivalvia",
             main.title.position = "centre") +
   tm_borders(alpha = 0.5)
@@ -157,22 +172,39 @@ porifera_N_OCC =  porifera_N_SP |>
 
 ## Merge  
 
-porifera_final = merge(porifera_N_SP, porifera_N_OCC, by= "ISO_A2.x")
-
-## Plot N species per country
-
-poriferaMap = st_as_sf(porifera_final) |> 
+porifera_final = merge(porifera_N_SP, porifera_N_OCC, by= "ISO_A2.x") |> 
   dplyr::rename(N_Species = gbifID.y) |> 
   dplyr::rename(N_Occurrences = freq)
 
-png(file="Porifera.png",
+## Plot
+
+poriferaMap = porifera_final  |> 
+  dplyr::select(ADMIN, N_Species,N_Occurrences)  
+
+poriferaMap2 = cntshp |> 
+  left_join(poriferaMap, by = "ADMIN") #|> 
+  #mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
+
+bbox_new = st_bbox(poriferaMap2) 
+xrange = bbox_new$xmax - bbox_new$xmin # range of x values
+yrange = bbox_new$ymax - bbox_new$ymin # range of y values
+
+# bbox_new[1] <- bbox_new[1] - (0.25 * xrange) # xmin - left
+bbox_new[3] <- bbox_new[3] + (0.20 * xrange) # xmax - right
+# bbox_new[2] <- bbox_new[2] - (0.25 * yrange) # ymin - bottom
+bbox_new[4] <- bbox_new[4] + (0.17 * yrange) # ymax - top
+
+bbox_new <- bbox_new %>%  # take the bounding box ...
+  st_as_sfc() # ... and make it a sf polygon
+
+png(file="Porifera",
     width=9, height=7, units="in", res=300)
-tm_shape(poriferaMap) +
+tm_shape(poriferaMap2,  bbox = bbox_new) +
   tm_fill(c("N_Species", "N_Occurrences"), 
-          n = 5,
+          n = 4,
           style = "jenks",
           palette = 'Blues') +
-  tm_layout(legend.position = c("left", "bottom"),
+  tm_layout(legend.position = c("right", "bottom"),
             main.title = "Porifera",
             main.title.position = "centre") +
   tm_borders(alpha = 0.5)
@@ -248,22 +280,39 @@ bryozoa_N_OCC =  bryozoa_N_SP |>
 
 ## Merge  
 
-bryozoa_final = merge(bryozoa_N_SP, bryozoa_N_OCC, by= "ISO_A2.x")
-
-## Plot N species per country
-
-bryozoaMap = st_as_sf(bryozoa_final) |> 
+bryozoa_final = merge(bryozoa_N_SP, bryozoa_N_OCC, by= "ISO_A2.x") |> 
   dplyr::rename(N_Species = gbifID.y) |> 
   dplyr::rename(N_Occurrences = freq)
 
-png(file="Bryozoa.png",
+## Plot
+
+bryozoaMap = bryozoa_final  |> 
+  dplyr::select(ADMIN, N_Species,N_Occurrences)  
+
+bryozoaMap2 = cntshp |> 
+  left_join(bryozoaMap, by = "ADMIN") #|> 
+  #mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
+
+bbox_new = st_bbox(bryozoaMap2) 
+xrange = bbox_new$xmax - bbox_new$xmin # range of x values
+yrange = bbox_new$ymax - bbox_new$ymin # range of y values
+
+# bbox_new[1] <- bbox_new[1] - (0.25 * xrange) # xmin - left
+bbox_new[3] <- bbox_new[3] + (0.20 * xrange) # xmax - right
+# bbox_new[2] <- bbox_new[2] - (0.25 * yrange) # ymin - bottom
+bbox_new[4] <- bbox_new[4] + (0.17 * yrange) # ymax - top
+
+bbox_new <- bbox_new %>%  # take the bounding box ...
+  st_as_sfc() # ... and make it a sf polygon
+
+png(file="Bryozoa",
     width=9, height=7, units="in", res=300)
-tm_shape(bryozoaMap) +
+tm_shape(bryozoaMap2,  bbox = bbox_new) +
   tm_fill(c("N_Species", "N_Occurrences"), 
-          n = 5,
+          n = 4,
           style = "jenks",
           palette = 'Blues') +
-  tm_layout(legend.position = c("left", "bottom"),
+  tm_layout(legend.position = c("right", "bottom"),
             main.title = "Bryozoa",
             main.title.position = "centre") +
   tm_borders(alpha = 0.5)
@@ -340,22 +389,39 @@ cnidaria_N_OCC =  cnidaria_N_SP |>
 
 ## Merge  
 
-cnidaria_final = merge(cnidaria_N_SP, cnidaria_N_OCC, by= "ISO_A2.x")
-
-## Plot N species per country
-
-cnidariaMap = st_as_sf(cnidaria_final) |> 
+cnidaria_final = merge(cnidaria_N_SP, cnidaria_N_OCC, by= "ISO_A2.x") |> 
   dplyr::rename(N_Species = gbifID.y) |> 
   dplyr::rename(N_Occurrences = freq)
 
-png(file="Cnidaria.png",
+## Plot
+
+cnidariaMap = cnidaria_final  |> 
+  dplyr::select(ADMIN, N_Species,N_Occurrences)  
+
+cnidariaMap2 = cntshp |> 
+  left_join(cnidariaMap, by = "ADMIN") #|> 
+#mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
+
+bbox_new = st_bbox(cnidariaMap2) 
+xrange = bbox_new$xmax - bbox_new$xmin # range of x values
+yrange = bbox_new$ymax - bbox_new$ymin # range of y values
+
+# bbox_new[1] <- bbox_new[1] - (0.25 * xrange) # xmin - left
+bbox_new[3] <- bbox_new[3] + (0.20 * xrange) # xmax - right
+# bbox_new[2] <- bbox_new[2] - (0.25 * yrange) # ymin - bottom
+bbox_new[4] <- bbox_new[4] + (0.17 * yrange) # ymax - top
+
+bbox_new <- bbox_new %>%  # take the bounding box ...
+  st_as_sfc() # ... and make it a sf polygon
+
+png(file="Cnidaria",
     width=9, height=7, units="in", res=300)
-tm_shape(cnidariaMap) +
+tm_shape(cnidariaMap2,  bbox = bbox_new) +
   tm_fill(c("N_Species", "N_Occurrences"), 
-          n = 5,
+          n = 4,
           style = "jenks",
           palette = 'Blues') +
-  tm_layout(legend.position = c("left", "bottom"),
+  tm_layout(legend.position = c("right", "bottom"),
             main.title = "Cnidaria",
             main.title.position = "centre") +
   tm_borders(alpha = 0.5)
@@ -431,22 +497,39 @@ simuliidae_N_OCC =  simuliidae_N_SP |>
 
 ## Merge  
 
-simuliidae_final = merge(simuliidae_N_SP, simuliidae_N_OCC, by= "ISO_A2.x")
-
-## Plot N species per country
-
-simuliidaeMap = st_as_sf(simuliidae_final) |> 
+simuliidae_final = merge(simuliidae_N_SP, simuliidae_N_OCC, by= "ISO_A2.x") |> 
   dplyr::rename(N_Species = gbifID.y) |> 
   dplyr::rename(N_Occurrences = freq)
 
-png(file="Simuliidae.png",
+## Plot
+
+simuliidaeMap = simuliidae_final  |> 
+  dplyr::select(ADMIN, N_Species,N_Occurrences)  
+
+simuliidaeMap2 = cntshp |> 
+  left_join(simuliidaeMap, by = "ADMIN") #|> 
+#mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
+
+bbox_new = st_bbox(simuliidaeMap2) 
+xrange = bbox_new$xmax - bbox_new$xmin # range of x values
+yrange = bbox_new$ymax - bbox_new$ymin # range of y values
+
+# bbox_new[1] <- bbox_new[1] - (0.25 * xrange) # xmin - left
+bbox_new[3] <- bbox_new[3] + (0.20 * xrange) # xmax - right
+# bbox_new[2] <- bbox_new[2] - (0.25 * yrange) # ymin - bottom
+bbox_new[4] <- bbox_new[4] + (0.17 * yrange) # ymax - top
+
+bbox_new <- bbox_new %>%  # take the bounding box ...
+  st_as_sfc() # ... and make it a sf polygon
+
+png(file="Simuliidae",
     width=9, height=7, units="in", res=300)
-tm_shape(simuliidaeMap) +
+tm_shape(simuliidaeMap2,  bbox = bbox_new) +
   tm_fill(c("N_Species", "N_Occurrences"), 
-          n = 5,
+          n = 4,
           style = "jenks",
           palette = 'Blues') +
-  tm_layout(legend.position = c("left", "bottom"),
+  tm_layout(legend.position = c("right", "bottom"),
             main.title = "Simuliidae",
             main.title.position = "centre") +
   tm_borders(alpha = 0.5)
@@ -523,22 +606,39 @@ culicidae_N_OCC =  culicidae_N_SP |>
 
 ## Merge  
 
-culicidae_final = merge(culicidae_N_SP, culicidae_N_OCC, by= "ISO_A2.x")
-
-## Plot N species per country
-
-culicidaeMap = st_as_sf(culicidae_final) |> 
+culicidae_final = merge(culicidae_N_SP, culicidae_N_OCC, by= "ISO_A2.x") |> 
   dplyr::rename(N_Species = gbifID.y) |> 
   dplyr::rename(N_Occurrences = freq)
 
-png(file="Culicidae.png",
+## Plot
+
+culicidaeMap = culicidae_final  |> 
+  dplyr::select(ADMIN, N_Species,N_Occurrences)  
+
+culicidaeMap2 = cntshp |> 
+  left_join(culicidaeMap, by = "ADMIN") #|> 
+#mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
+
+bbox_new = st_bbox(culicidaeMap2) 
+xrange = bbox_new$xmax - bbox_new$xmin # range of x values
+yrange = bbox_new$ymax - bbox_new$ymin # range of y values
+
+# bbox_new[1] <- bbox_new[1] - (0.25 * xrange) # xmin - left
+bbox_new[3] <- bbox_new[3] + (0.20 * xrange) # xmax - right
+# bbox_new[2] <- bbox_new[2] - (0.25 * yrange) # ymin - bottom
+bbox_new[4] <- bbox_new[4] + (0.17 * yrange) # ymax - top
+
+bbox_new <- bbox_new %>%  # take the bounding box ...
+  st_as_sfc() # ... and make it a sf polygon
+
+png(file="Culicidae",
     width=9, height=7, units="in", res=300)
-tm_shape(culicidaeMap) +
+tm_shape(culicidaeMap2,  bbox = bbox_new) +
   tm_fill(c("N_Species", "N_Occurrences"), 
-          n = 5,
+          n = 4,
           style = "jenks",
           palette = 'Blues') +
-  tm_layout(legend.position = c("left", "bottom"),
+  tm_layout(legend.position = c("right", "bottom"),
             main.title = "Culicidae",
             main.title.position = "centre") +
   tm_borders(alpha = 0.5)
@@ -546,7 +646,6 @@ tm_shape(culicidaeMap) +
 dev.off()
 rm(list = ls())
 .rs.restartR()
-
 
 ## Nematoda
 
@@ -615,22 +714,39 @@ nematoda_N_OCC =  nematoda_N_SP |>
 
 ## Merge  
 
-nematoda_final = merge(nematoda_N_SP, nematoda_N_OCC, by= "ISO_A2.x")
-
-## Plot N species per country
-
-nematodaMap = st_as_sf(nematoda_final) |> 
+nematoda_final = merge(nematoda_N_SP, nematoda_N_OCC, by= "ISO_A2.x") |> 
   dplyr::rename(N_Species = gbifID.y) |> 
   dplyr::rename(N_Occurrences = freq)
 
-png(file="Nematoda.png",
+## Plot
+
+nematodaMap = nematoda_final  |> 
+  dplyr::select(ADMIN, N_Species,N_Occurrences)  
+
+nematodaMap2 = cntshp |> 
+  left_join(nematodaMap, by = "ADMIN") #|> 
+#mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
+
+bbox_new = st_bbox(nematodaMap2) 
+xrange = bbox_new$xmax - bbox_new$xmin # range of x values
+yrange = bbox_new$ymax - bbox_new$ymin # range of y values
+
+# bbox_new[1] <- bbox_new[1] - (0.25 * xrange) # xmin - left
+bbox_new[3] <- bbox_new[3] + (0.20 * xrange) # xmax - right
+# bbox_new[2] <- bbox_new[2] - (0.25 * yrange) # ymin - bottom
+bbox_new[4] <- bbox_new[4] + (0.17 * yrange) # ymax - top
+
+bbox_new <- bbox_new %>%  # take the bounding box ...
+  st_as_sfc() # ... and make it a sf polygon
+
+png(file="Nematoda",
     width=9, height=7, units="in", res=300)
-tm_shape(nematodaMap) +
+tm_shape(nematodaMap2,  bbox = bbox_new) +
   tm_fill(c("N_Species", "N_Occurrences"), 
-          n = 5,
+          n = 4,
           style = "jenks",
           palette = 'Blues') +
-  tm_layout(legend.position = c("left", "bottom"),
+  tm_layout(legend.position = c("right", "bottom"),
             main.title = "Nematoda",
             main.title.position = "centre") +
   tm_borders(alpha = 0.5)
@@ -706,22 +822,39 @@ nematomorpha_N_OCC =  nematomorpha_N_SP |>
 
 ## Merge  
 
-nematomorpha_final = merge(nematomorpha_N_SP, nematomorpha_N_OCC, by= "ISO_A2.x")
-
-## Plot N species per country
-
-nematomorphaMap = st_as_sf(nematomorpha_final) |> 
+nematomorpha_final = merge(nematomorpha_N_SP, nematomorpha_N_OCC, by= "ISO_A2.x") |> 
   dplyr::rename(N_Species = gbifID.y) |> 
   dplyr::rename(N_Occurrences = freq)
 
-png(file="Nematomorpha.png",
+## Plot
+
+nematomorphaMap = nematomorpha_final  |> 
+  dplyr::select(ADMIN, N_Species,N_Occurrences)  
+
+nematomorphaMap2 = cntshp |> 
+  left_join(nematomorphaMap, by = "ADMIN") #|> 
+#mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
+
+bbox_new = st_bbox(nematomorphaMap2) 
+xrange = bbox_new$xmax - bbox_new$xmin # range of x values
+yrange = bbox_new$ymax - bbox_new$ymin # range of y values
+
+# bbox_new[1] <- bbox_new[1] - (0.25 * xrange) # xmin - left
+bbox_new[3] <- bbox_new[3] + (0.20 * xrange) # xmax - right
+# bbox_new[2] <- bbox_new[2] - (0.25 * yrange) # ymin - bottom
+bbox_new[4] <- bbox_new[4] + (0.17 * yrange) # ymax - top
+
+bbox_new <- bbox_new %>%  # take the bounding box ...
+  st_as_sfc() # ... and make it a sf polygon
+
+png(file="Nematomorpha",
     width=9, height=7, units="in", res=300)
-tm_shape(nematomorphaMap) +
+tm_shape(nematomorphaMap2,  bbox = bbox_new) +
   tm_fill(c("N_Species", "N_Occurrences"), 
-          n = 5,
+          n = 4,
           style = "jenks",
           palette = 'Blues') +
-  tm_layout(legend.position = c("left", "bottom"),
+  tm_layout(legend.position = c("right", "bottom"),
             main.title = "Nematomorpha",
             main.title.position = "centre") +
   tm_borders(alpha = 0.5)
@@ -797,23 +930,258 @@ tubellaria_N_OCC =  tubellaria_N_SP |>
 
 ## Merge  
 
-tubellaria_final = merge(tubellaria_N_SP, tubellaria_N_OCC, by= "ISO_A2.x")
-
-## Plot N species per country
-
-tubellariaMap = st_as_sf(tubellaria_final) |> 
+tubellaria_final = merge(tubellaria_N_SP, tubellaria_N_OCC, by= "ISO_A2.x") |> 
   dplyr::rename(N_Species = gbifID.y) |> 
   dplyr::rename(N_Occurrences = freq)
 
-png(file="Tubellaria.png",
+## Plot
+
+tubellariaMap = tubellaria_final  |> 
+  dplyr::select(ADMIN, N_Species,N_Occurrences)  
+
+tubellariaMap2 = cntshp |> 
+  left_join(tubellariaMap, by = "ADMIN") #|> 
+#mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
+
+bbox_new = st_bbox(tubellariaMap2) 
+xrange = bbox_new$xmax - bbox_new$xmin # range of x values
+yrange = bbox_new$ymax - bbox_new$ymin # range of y values
+
+# bbox_new[1] <- bbox_new[1] - (0.25 * xrange) # xmin - left
+bbox_new[3] <- bbox_new[3] + (0.20 * xrange) # xmax - right
+# bbox_new[2] <- bbox_new[2] - (0.25 * yrange) # ymin - bottom
+bbox_new[4] <- bbox_new[4] + (0.17 * yrange) # ymax - top
+
+bbox_new <- bbox_new %>%  # take the bounding box ...
+  st_as_sfc() # ... and make it a sf polygon
+
+png(file="Tubellaria",
     width=9, height=7, units="in", res=300)
-tm_shape(tubellariaMap) +
+tm_shape(tubellariaMap2,  bbox = bbox_new) +
   tm_fill(c("N_Species", "N_Occurrences"), 
-          n = 5,
+          n = 4,
           style = "jenks",
           palette = 'Blues') +
-  tm_layout(legend.position = c("left", "bottom"),
+  tm_layout(legend.position = c("right", "bottom"),
             main.title = "Tubellaria",
+            main.title.position = "centre") +
+  tm_borders(alpha = 0.5)
+
+dev.off()
+rm(list = ls())
+.rs.restartR()
+
+## Cephalocaridae
+
+library(data.table)
+library(plyr)
+library(dplyr)
+library(raster)
+library(readr)
+library(rgdal)
+library(dplyr)
+library(sf)
+library(sp)
+library(tidyr)
+library(tmap)
+library(tidyverse)
+
+## Read Shape
+
+shpfile = readOGR("data/shape/buffer_hydro_global/b_join_river_country.shp")
+
+countryshp = readOGR("data/shape/ne_10m_admin_0_countries/ne_10m_admin_0_countries.shp")
+
+
+gbifraw = data.table::fread("data-raw/crustacea/cephalocaridae/0167054-220831081235567.csv") 
+
+gbif = gbifraw |> 
+  dplyr::as_tibble() |> 
+  dplyr::distinct(decimalLatitude, decimalLongitude, .keep_all = TRUE)
+
+xy = gbif |> 
+  dplyr::select(decimalLatitude, decimalLongitude)
+
+pts = SpatialPointsDataFrame(coords = xy, data = gbif, proj4string = CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"))
+
+gb = st_as_sf(pts, coords = xy, st_crs(4326)) |> 
+  dplyr::rename(ISO_A2 = countryCode)
+
+shp = st_as_sf(shpfile, st_crs(4326))
+
+good_points = st_filter(gb, shp)
+
+#plot(st_geometry(good_points))
+
+cntshp = st_as_sf(countryshp, st_crs(4326))
+
+cephalocaridaejoin = st_join(cntshp, good_points) |> 
+  as_tibble()
+
+cephalocaridae_n_sp = cephalocaridaejoin |>
+  tidyr::drop_na(c(decimalLatitude, decimalLongitude, species, ISO_A2.x)) |> 
+  dplyr::select(species, ISO_A2.x) |>
+  dplyr::distinct(species, ISO_A2.x) |> 
+  dplyr::group_by(species,ISO_A2.x) #|> 
+#raster::subset(ISO_A2.x != -99) 
+
+cephalocaridae_N_SPP = plyr::count(cephalocaridae_n_sp$ISO_A2.x) 
+cephalocaridae_N_SPP = dplyr::rename(cephalocaridae_N_SPP, ISO_A2.x = x)
+
+cephalocaridae_N_SP = merge(cephalocaridaejoin, cephalocaridae_N_SPP, by= "ISO_A2.x")
+
+## Count occ per country 
+
+cephalocaridae_N_OCC =  cephalocaridae_N_SP |> 
+  dplyr::group_by(ISO_A2.x) |> 
+  dplyr::summarise(gbifID = n()) 
+
+## Merge  
+
+cephalocaridae_final = merge(cephalocaridae_N_SP, cephalocaridae_N_OCC, by= "ISO_A2.x") |> 
+  dplyr::rename(N_Species = gbifID.y) |> 
+  dplyr::rename(N_Occurrences = freq)
+
+## Plot
+
+cephalocaridaeMap = cephalocaridae_final  |> 
+  dplyr::select(ADMIN, N_Species,N_Occurrences)  
+
+cephalocaridaeMap2 = cntshp |> 
+  left_join(cephalocaridaeMap, by = "ADMIN") #|> 
+#mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
+
+bbox_new = st_bbox(cephalocaridaeMap2) 
+xrange = bbox_new$xmax - bbox_new$xmin # range of x values
+yrange = bbox_new$ymax - bbox_new$ymin # range of y values
+
+# bbox_new[1] <- bbox_new[1] - (0.25 * xrange) # xmin - left
+bbox_new[3] <- bbox_new[3] + (0.20 * xrange) # xmax - right
+# bbox_new[2] <- bbox_new[2] - (0.25 * yrange) # ymin - bottom
+bbox_new[4] <- bbox_new[4] + (0.17 * yrange) # ymax - top
+
+bbox_new <- bbox_new %>%  # take the bounding box ...
+  st_as_sfc() # ... and make it a sf polygon
+
+png(file="Cephalocaridae",
+    width=9, height=7, units="in", res=300)
+tm_shape(cephalocaridaeMap2,  bbox = bbox_new) +
+  tm_fill(c("N_Species", "N_Occurrences"), 
+          n = 4,
+          style = "jenks",
+          palette = 'Blues') +
+  tm_layout(legend.position = c("right", "bottom"),
+            main.title = "Cephalocaridae",
+            main.title.position = "centre") +
+  tm_borders(alpha = 0.5)
+
+dev.off()
+rm(list = ls())
+.rs.restartR()
+
+## Diplostraca
+
+library(data.table)
+library(plyr)
+library(dplyr)
+library(raster)
+library(readr)
+library(rgdal)
+library(dplyr)
+library(sf)
+library(sp)
+library(tidyr)
+library(tmap)
+library(tidyverse)
+
+## Read Shape
+
+shpfile = readOGR("data/shape/buffer_hydro_global/b_join_river_country.shp")
+
+countryshp = readOGR("data/shape/ne_10m_admin_0_countries/ne_10m_admin_0_countries.shp")
+
+
+gbifraw = data.table::fread("data-raw/crustacea/diplostraca/0167039-220831081235567.csv") 
+
+gbif = gbifraw |> 
+  dplyr::as_tibble() |> 
+  dplyr::distinct(decimalLatitude, decimalLongitude, .keep_all = TRUE)
+
+xy = gbif |> 
+  dplyr::select(decimalLatitude, decimalLongitude)
+
+pts = SpatialPointsDataFrame(coords = xy, data = gbif, proj4string = CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"))
+
+gb = st_as_sf(pts, coords = xy, st_crs(4326)) |> 
+  dplyr::rename(ISO_A2 = countryCode)
+
+shp = st_as_sf(shpfile, st_crs(4326))
+
+good_points = st_filter(gb, shp)
+
+#good_points = st_as_sf(gb)
+
+#plot(st_geometry(good_points))
+
+cntshp = st_as_sf(countryshp, st_crs(4326))
+
+diplostracajoin = st_join(cntshp, good_points) |> 
+  as_tibble()
+
+diplostraca_n_sp = diplostracajoin |>
+  tidyr::drop_na(c(decimalLatitude, decimalLongitude, species,ISO_A2.x)) |> 
+  dplyr::select(species, ISO_A2.x) |>
+  dplyr::distinct(species, ISO_A2.x) |> 
+  dplyr::group_by(species,ISO_A2.x) #|> 
+#raster::subset(ISO_A2.x != -99) 
+
+diplostraca_N_SPP = plyr::count(diplostraca_n_sp$ISO_A2.x) 
+diplostraca_N_SPP = dplyr::rename(diplostraca_N_SPP, ISO_A2.x = x)
+
+diplostraca_N_SP = merge(diplostracajoin, diplostraca_N_SPP, by= "ISO_A2.x")
+
+## Count occ per country 
+
+diplostraca_N_OCC =  diplostraca_N_SP |> 
+  dplyr::group_by(ISO_A2.x) |> 
+  dplyr::summarise(gbifID = n()) 
+
+## Merge  
+
+diplostraca_final = merge(diplostraca_N_SP, diplostraca_N_OCC, by= "ISO_A2.x") |> 
+  dplyr::rename(N_Species = gbifID.y) |> 
+  dplyr::rename(N_Occurrences = freq)
+
+## Plot
+
+diplostracaMap = diplostraca_final  |> 
+  dplyr::select(ADMIN, N_Species,N_Occurrences)  
+
+diplostracaMap2 = cntshp |> 
+  left_join(diplostracaMap, by = "ADMIN") #|> 
+#mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
+
+bbox_new = st_bbox(diplostracaMap2) 
+xrange = bbox_new$xmax - bbox_new$xmin # range of x values
+yrange = bbox_new$ymax - bbox_new$ymin # range of y values
+
+# bbox_new[1] <- bbox_new[1] - (0.25 * xrange) # xmin - left
+bbox_new[3] <- bbox_new[3] + (0.20 * xrange) # xmax - right
+# bbox_new[2] <- bbox_new[2] - (0.25 * yrange) # ymin - bottom
+bbox_new[4] <- bbox_new[4] + (0.17 * yrange) # ymax - top
+
+bbox_new <- bbox_new %>%  # take the bounding box ...
+  st_as_sfc() # ... and make it a sf polygon
+
+png(file="Diplostraca",
+    width=9, height=7, units="in", res=300)
+tm_shape(diplostracaMap2,  bbox = bbox_new) +
+  tm_fill(c("N_Species", "N_Occurrences"), 
+          n = 4,
+          style = "jenks",
+          palette = 'Blues') +
+  tm_layout(legend.position = c("right", "bottom"),
+            main.title = "Diplostraca",
             main.title.position = "centre") +
   tm_borders(alpha = 0.5)
 
@@ -889,22 +1257,39 @@ ostracoda_N_OCC =  ostracoda_N_SP |>
 
 ## Merge  
 
-ostracoda_final = merge(ostracoda_N_SP, ostracoda_N_OCC, by= "ISO_A2.x")
-
-## Plot N species per country
-
-ostracodaMap = st_as_sf(ostracoda_final) |> 
+ostracoda_final = merge(ostracoda_N_SP, ostracoda_N_OCC, by= "ISO_A2.x") |> 
   dplyr::rename(N_Species = gbifID.y) |> 
   dplyr::rename(N_Occurrences = freq)
 
+## Plot
+
+ostracodaMap = ostracoda_final  |> 
+  dplyr::select(ADMIN, N_Species,N_Occurrences)  
+
+ostracodaMap2 = cntshp |> 
+  left_join(ostracodaMap, by = "ADMIN") #|> 
+#mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
+
+bbox_new = st_bbox(ostracodaMap2) 
+xrange = bbox_new$xmax - bbox_new$xmin # range of x values
+yrange = bbox_new$ymax - bbox_new$ymin # range of y values
+
+# bbox_new[1] <- bbox_new[1] - (0.25 * xrange) # xmin - left
+bbox_new[3] <- bbox_new[3] + (0.20 * xrange) # xmax - right
+# bbox_new[2] <- bbox_new[2] - (0.25 * yrange) # ymin - bottom
+bbox_new[4] <- bbox_new[4] + (0.17 * yrange) # ymax - top
+
+bbox_new <- bbox_new %>%  # take the bounding box ...
+  st_as_sfc() # ... and make it a sf polygon
+
 png(file="Ostracoda",
     width=9, height=7, units="in", res=300)
-tm_shape(ostracodaMap) +
+tm_shape(ostracodaMap2,  bbox = bbox_new) +
   tm_fill(c("N_Species", "N_Occurrences"), 
-          n = 5,
+          n = 4,
           style = "jenks",
           palette = 'Blues') +
-  tm_layout(legend.position = c("left", "bottom"),
+  tm_layout(legend.position = c("right", "bottom"),
             main.title = "Ostracoda",
             main.title.position = "centre") +
   tm_borders(alpha = 0.5)
@@ -912,7 +1297,6 @@ tm_shape(ostracodaMap) +
 dev.off()
 rm(list = ls())
 .rs.restartR()
-
 
 ## Isopoda
 
@@ -981,22 +1365,39 @@ isopoda_N_OCC =  isopoda_N_SP |>
 
 ## Merge  
 
-isopoda_final = merge(isopoda_N_SP, isopoda_N_OCC, by= "ISO_A2.x")
-
-## Plot N species per country
-
-isopodaMap = st_as_sf(isopoda_final) |> 
+isopoda_final = merge(isopoda_N_SP, isopoda_N_OCC, by= "ISO_A2.x") |> 
   dplyr::rename(N_Species = gbifID.y) |> 
   dplyr::rename(N_Occurrences = freq)
 
+## Plot
+
+isopodaMap = isopoda_final  |> 
+  dplyr::select(ADMIN, N_Species,N_Occurrences)  
+
+isopodaMap2 = cntshp |> 
+  left_join(isopodaMap, by = "ADMIN") #|> 
+#mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
+
+bbox_new = st_bbox(isopodaMap2) 
+xrange = bbox_new$xmax - bbox_new$xmin # range of x values
+yrange = bbox_new$ymax - bbox_new$ymin # range of y values
+
+# bbox_new[1] <- bbox_new[1] - (0.25 * xrange) # xmin - left
+bbox_new[3] <- bbox_new[3] + (0.20 * xrange) # xmax - right
+# bbox_new[2] <- bbox_new[2] - (0.25 * yrange) # ymin - bottom
+bbox_new[4] <- bbox_new[4] + (0.17 * yrange) # ymax - top
+
+bbox_new <- bbox_new %>%  # take the bounding box ...
+  st_as_sfc() # ... and make it a sf polygon
+
 png(file="Isopoda",
     width=9, height=7, units="in", res=300)
-tm_shape(isopodaMap) +
+tm_shape(isopodaMap2,  bbox = bbox_new) +
   tm_fill(c("N_Species", "N_Occurrences"), 
-          n = 5,
+          n = 4,
           style = "jenks",
           palette = 'Blues') +
-  tm_layout(legend.position = c("left", "bottom"),
+  tm_layout(legend.position = c("right", "bottom"),
             main.title = "Isopoda",
             main.title.position = "centre") +
   tm_borders(alpha = 0.5)
@@ -1005,6 +1406,221 @@ dev.off()
 rm(list = ls())
 .rs.restartR()
 
+## Maxillopoda
+
+library(data.table)
+library(plyr)
+library(dplyr)
+library(raster)
+library(readr)
+library(rgdal)
+library(dplyr)
+library(sf)
+library(sp)
+library(tidyr)
+library(tmap)
+library(tidyverse)
+
+## Read Shape
+
+shpfile = readOGR("data/shape/buffer_hydro_global/b_join_river_country.shp")
+
+countryshp = readOGR("data/shape/ne_10m_admin_0_countries/ne_10m_admin_0_countries.shp")
+
+
+gbifraw = data.table::fread("data-raw/crustacea/maxillopoda/0167051-220831081235567.csv") 
+
+gbif = gbifraw |> 
+  dplyr::as_tibble() |> 
+  dplyr::distinct(decimalLatitude, decimalLongitude, .keep_all = TRUE)
+
+xy = gbif |> 
+  dplyr::select(decimalLatitude, decimalLongitude)
+
+pts = SpatialPointsDataFrame(coords = xy, data = gbif, proj4string = CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"))
+
+gb = st_as_sf(pts, coords = xy, st_crs(4326)) |> 
+  dplyr::rename(ISO_A2 = countryCode)
+
+shp = st_as_sf(shpfile, st_crs(4326))
+
+good_points = st_filter(gb, shp)
+
+#plot(st_geometry(good_points))
+
+cntshp = st_as_sf(countryshp, st_crs(4326))
+
+maxillopodajoin = st_join(cntshp, good_points) |> 
+  as_tibble()
+
+maxillopoda_n_sp = maxillopodajoin |>
+  tidyr::drop_na(c(decimalLatitude, decimalLongitude, species, ISO_A2.x)) |> 
+  dplyr::select(species, ISO_A2.x) |>
+  dplyr::distinct(species, ISO_A2.x) |> 
+  dplyr::group_by(species,ISO_A2.x) #|> 
+#raster::subset(ISO_A2.x != -99) 
+
+maxillopoda_N_SPP = plyr::count(maxillopoda_n_sp$ISO_A2.x) 
+maxillopoda_N_SPP = dplyr::rename(maxillopoda_N_SPP, ISO_A2.x = x)
+
+maxillopoda_N_SP = merge(maxillopodajoin, maxillopoda_N_SPP, by= "ISO_A2.x")
+
+## Count occ per country 
+
+maxillopoda_N_OCC =  maxillopoda_N_SP |> 
+  dplyr::group_by(ISO_A2.x) |> 
+  dplyr::summarise(gbifID = n()) 
+
+## Merge  
+
+maxillopoda_final = merge(maxillopoda_N_SP, maxillopoda_N_OCC, by= "ISO_A2.x") |> 
+  dplyr::rename(N_Species = gbifID.y) |> 
+  dplyr::rename(N_Occurrences = freq)
+
+## Plot
+
+maxillopodaMap = maxillopoda_final  |> 
+  dplyr::select(ADMIN, N_Species,N_Occurrences)  
+
+maxillopodaMap2 = cntshp |> 
+  left_join(maxillopodaMap, by = "ADMIN") #|> 
+#mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
+
+bbox_new = st_bbox(maxillopodaMap2) 
+xrange = bbox_new$xmax - bbox_new$xmin # range of x values
+yrange = bbox_new$ymax - bbox_new$ymin # range of y values
+
+# bbox_new[1] <- bbox_new[1] - (0.25 * xrange) # xmin - left
+bbox_new[3] <- bbox_new[3] + (0.20 * xrange) # xmax - right
+# bbox_new[2] <- bbox_new[2] - (0.25 * yrange) # ymin - bottom
+bbox_new[4] <- bbox_new[4] + (0.17 * yrange) # ymax - top
+
+bbox_new <- bbox_new %>%  # take the bounding box ...
+  st_as_sfc() # ... and make it a sf polygon
+
+png(file="Maxillopoda",
+    width=9, height=7, units="in", res=300)
+tm_shape(maxillopodaMap2,  bbox = bbox_new) +
+  tm_fill(c("N_Species", "N_Occurrences"), 
+          n = 4,
+          style = "jenks",
+          palette = 'Blues') +
+  tm_layout(legend.position = c("right", "bottom"),
+            main.title = "Maxillopoda",
+            main.title.position = "centre") +
+  tm_borders(alpha = 0.5)
+
+dev.off()
+rm(list = ls())
+.rs.restartR()
+
+## Remipedia
+
+library(data.table)
+library(plyr)
+library(dplyr)
+library(raster)
+library(readr)
+library(rgdal)
+library(dplyr)
+library(sf)
+library(sp)
+library(tidyr)
+library(tmap)
+library(tidyverse)
+
+## Read Shape
+
+shpfile = readOGR("data/shape/buffer_hydro_global/b_join_river_country.shp")
+
+countryshp = readOGR("data/shape/ne_10m_admin_0_countries/ne_10m_admin_0_countries.shp")
+
+
+gbifraw = data.table::fread("data-raw/crustacea/remipedia/0167056-220831081235567.csv") 
+
+gbif = gbifraw |> 
+  dplyr::as_tibble() |> 
+  dplyr::distinct(decimalLatitude, decimalLongitude, .keep_all = TRUE)
+
+xy = gbif |> 
+  dplyr::select(decimalLatitude, decimalLongitude)
+
+pts = SpatialPointsDataFrame(coords = xy, data = gbif, proj4string = CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"))
+
+gb = st_as_sf(pts, coords = xy, st_crs(4326)) |> 
+  dplyr::rename(ISO_A2 = countryCode)
+
+shp = st_as_sf(shpfile, st_crs(4326))
+
+good_points = st_filter(gb, shp)
+
+#plot(st_geometry(good_points))
+
+cntshp = st_as_sf(countryshp, st_crs(4326))
+
+remipediajoin = st_join(cntshp, good_points) |> 
+  as_tibble()
+
+remipedia_n_sp = remipediajoin |>
+  tidyr::drop_na(c(decimalLatitude, decimalLongitude, species, ISO_A2.x)) |> 
+  dplyr::select(species, ISO_A2.x) |>
+  dplyr::distinct(species, ISO_A2.x) |> 
+  dplyr::group_by(species,ISO_A2.x) #|> 
+#raster::subset(ISO_A2.x != -99) 
+
+remipedia_N_SPP = plyr::count(remipedia_n_sp$ISO_A2.x) 
+remipedia_N_SPP = dplyr::rename(remipedia_N_SPP, ISO_A2.x = x)
+
+remipedia_N_SP = merge(remipediajoin, remipedia_N_SPP, by= "ISO_A2.x")
+
+## Count occ per country 
+
+remipedia_N_OCC =  remipedia_N_SP |> 
+  dplyr::group_by(ISO_A2.x) |> 
+  dplyr::summarise(gbifID = n()) 
+
+## Merge  
+
+remipedia_final = merge(remipedia_N_SP, remipedia_N_OCC, by= "ISO_A2.x") |> 
+  dplyr::rename(N_Species = gbifID.y) |> 
+  dplyr::rename(N_Occurrences = freq)
+
+## Plot
+
+remipediaMap = remipedia_final  |> 
+  dplyr::select(ADMIN, N_Species,N_Occurrences)  
+
+remipediaMap2 = cntshp |> 
+  left_join(remipediaMap, by = "ADMIN") #|> 
+#mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
+
+bbox_new = st_bbox(remipediaMap2) 
+xrange = bbox_new$xmax - bbox_new$xmin # range of x values
+yrange = bbox_new$ymax - bbox_new$ymin # range of y values
+
+# bbox_new[1] <- bbox_new[1] - (0.25 * xrange) # xmin - left
+bbox_new[3] <- bbox_new[3] + (0.20 * xrange) # xmax - right
+# bbox_new[2] <- bbox_new[2] - (0.25 * yrange) # ymin - bottom
+bbox_new[4] <- bbox_new[4] + (0.17 * yrange) # ymax - top
+
+bbox_new <- bbox_new %>%  # take the bounding box ...
+  st_as_sfc() # ... and make it a sf polygon
+
+png(file="Remipedia",
+    width=9, height=7, units="in", res=300)
+tm_shape(remipediaMap2,  bbox = bbox_new) +
+  tm_fill(c("N_Species", "N_Occurrences"), 
+          n = 4,
+          style = "jenks",
+          palette = 'Blues') +
+  tm_layout(legend.position = c("right", "bottom"),
+            main.title = "Remipedia",
+            main.title.position = "centre") +
+  tm_borders(alpha = 0.5)
+
+dev.off()
+rm(list = ls())
+.rs.restartR()
 
 ## Megaloptera
 
@@ -1073,22 +1689,39 @@ megaloptera_N_OCC =  megaloptera_N_SP |>
 
 ## Merge  
 
-megaloptera_final = merge(megaloptera_N_SP, megaloptera_N_OCC, by= "ISO_A2.x")
-
-## Plot N species per country
-
-megalopteraMap = st_as_sf(megaloptera_final) |> 
+megaloptera_final = merge(megaloptera_N_SP, megaloptera_N_OCC, by= "ISO_A2.x") |> 
   dplyr::rename(N_Species = gbifID.y) |> 
   dplyr::rename(N_Occurrences = freq)
 
+## Plot
+
+megalopteraMap = megaloptera_final  |> 
+  dplyr::select(ADMIN, N_Species,N_Occurrences)  
+
+megalopteraMap2 = cntshp |> 
+  left_join(megalopteraMap, by = "ADMIN") #|> 
+#mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
+
+bbox_new = st_bbox(megalopteraMap2) 
+xrange = bbox_new$xmax - bbox_new$xmin # range of x values
+yrange = bbox_new$ymax - bbox_new$ymin # range of y values
+
+# bbox_new[1] <- bbox_new[1] - (0.25 * xrange) # xmin - left
+bbox_new[3] <- bbox_new[3] + (0.20 * xrange) # xmax - right
+# bbox_new[2] <- bbox_new[2] - (0.25 * yrange) # ymin - bottom
+bbox_new[4] <- bbox_new[4] + (0.17 * yrange) # ymax - top
+
+bbox_new <- bbox_new %>%  # take the bounding box ...
+  st_as_sfc() # ... and make it a sf polygon
+
 png(file="Megaloptera",
     width=9, height=7, units="in", res=300)
-tm_shape(megalopteraMap) +
+tm_shape(megalopteraMap2,  bbox = bbox_new) +
   tm_fill(c("N_Species", "N_Occurrences"), 
-          n = 5,
+          n = 4,
           style = "jenks",
           palette = 'Blues') +
-  tm_layout(legend.position = c("left", "bottom"),
+  tm_layout(legend.position = c("right", "bottom"),
             main.title = "Megaloptera",
             main.title.position = "centre") +
   tm_borders(alpha = 0.5)
@@ -1165,19 +1798,36 @@ trichoptera_N_OCC =  trichoptera_N_SP |>
 
 ## Merge  
 
-trichoptera_final = merge(trichoptera_N_SP, trichoptera_N_OCC, by= "ISO_A2.x")
-
-## Plot N species per country
-
-trichopteraMap = st_as_sf(trichoptera_final) |> 
+trichoptera_final = merge(trichoptera_N_SP, trichoptera_N_OCC, by= "ISO_A2.x") |> 
   dplyr::rename(N_Species = gbifID.y) |> 
   dplyr::rename(N_Occurrences = freq)
 
+## Plot
+
+trichopteraMap = trichoptera_final  |> 
+  dplyr::select(ADMIN, N_Species,N_Occurrences)  
+
+trichopteraMap2 = cntshp |> 
+  left_join(trichopteraMap, by = "ADMIN") #|> 
+#mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
+
+bbox_new = st_bbox(trichopteraMap2) 
+xrange = bbox_new$xmax - bbox_new$xmin # range of x values
+yrange = bbox_new$ymax - bbox_new$ymin # range of y values
+
+# bbox_new[1] <- bbox_new[1] - (0.25 * xrange) # xmin - left
+bbox_new[3] <- bbox_new[3] + (0.20 * xrange) # xmax - right
+# bbox_new[2] <- bbox_new[2] - (0.25 * yrange) # ymin - bottom
+bbox_new[4] <- bbox_new[4] + (0.17 * yrange) # ymax - top
+
+bbox_new <- bbox_new %>%  # take the bounding box ...
+  st_as_sfc() # ... and make it a sf polygon
+
 png(file="Trichoptera",
     width=9, height=7, units="in", res=300)
-tm_shape(trichopteraMap) +
+tm_shape(trichopteraMap2,  bbox = bbox_new) +
   tm_fill(c("N_Species", "N_Occurrences"), 
-          n = 5,
+          n = 4,
           style = "jenks",
           palette = 'Blues') +
   tm_layout(legend.position = c("right", "bottom"),
@@ -1188,7 +1838,6 @@ tm_shape(trichopteraMap) +
 dev.off()
 rm(list = ls())
 .rs.restartR()
-
 
 ## Hemiptera
 
@@ -1257,19 +1906,36 @@ hemiptera_N_OCC =  hemiptera_N_SP |>
 
 ## Merge  
 
-hemiptera_final = merge(hemiptera_N_SP, hemiptera_N_OCC, by= "ISO_A2.x")
-
-## Plot N species per country
-
-hemipteraMap = st_as_sf(hemiptera_final) |> 
+hemiptera_final = merge(hemiptera_N_SP, hemiptera_N_OCC, by= "ISO_A2.x") |> 
   dplyr::rename(N_Species = gbifID.y) |> 
   dplyr::rename(N_Occurrences = freq)
 
+## Plot
+
+hemipteraMap = hemiptera_final  |> 
+  dplyr::select(ADMIN, N_Species,N_Occurrences)  
+
+hemipteraMap2 = cntshp |> 
+  left_join(hemipteraMap, by = "ADMIN") #|> 
+#mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
+
+bbox_new = st_bbox(hemipteraMap2) 
+xrange = bbox_new$xmax - bbox_new$xmin # range of x values
+yrange = bbox_new$ymax - bbox_new$ymin # range of y values
+
+# bbox_new[1] <- bbox_new[1] - (0.25 * xrange) # xmin - left
+bbox_new[3] <- bbox_new[3] + (0.20 * xrange) # xmax - right
+# bbox_new[2] <- bbox_new[2] - (0.25 * yrange) # ymin - bottom
+bbox_new[4] <- bbox_new[4] + (0.17 * yrange) # ymax - top
+
+bbox_new <- bbox_new %>%  # take the bounding box ...
+  st_as_sfc() # ... and make it a sf polygon
+
 png(file="Hemiptera",
     width=9, height=7, units="in", res=300)
-tm_shape(hemipteraMap) +
+tm_shape(hemipteraMap2,  bbox = bbox_new) +
   tm_fill(c("N_Species", "N_Occurrences"), 
-          n = 5,
+          n = 4,
           style = "jenks",
           palette = 'Blues') +
   tm_layout(legend.position = c("right", "bottom"),
@@ -1348,19 +2014,36 @@ plecoptera_N_OCC =  plecoptera_N_SP |>
 
 ## Merge  
 
-plecoptera_final = merge(plecoptera_N_SP, plecoptera_N_OCC, by= "ISO_A2.x")
-
-## Plot N species per country
-
-plecopteraMap = st_as_sf(plecoptera_final) |> 
+plecoptera_final = merge(plecoptera_N_SP, plecoptera_N_OCC, by= "ISO_A2.x") |> 
   dplyr::rename(N_Species = gbifID.y) |> 
   dplyr::rename(N_Occurrences = freq)
 
+## Plot
+
+plecopteraMap = plecoptera_final  |> 
+  dplyr::select(ADMIN, N_Species,N_Occurrences)  
+
+plecopteraMap2 = cntshp |> 
+  left_join(plecopteraMap, by = "ADMIN") #|> 
+#mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
+
+bbox_new = st_bbox(plecopteraMap2) 
+xrange = bbox_new$xmax - bbox_new$xmin # range of x values
+yrange = bbox_new$ymax - bbox_new$ymin # range of y values
+
+# bbox_new[1] <- bbox_new[1] - (0.25 * xrange) # xmin - left
+bbox_new[3] <- bbox_new[3] + (0.20 * xrange) # xmax - right
+# bbox_new[2] <- bbox_new[2] - (0.25 * yrange) # ymin - bottom
+bbox_new[4] <- bbox_new[4] + (0.17 * yrange) # ymax - top
+
+bbox_new <- bbox_new %>%  # take the bounding box ...
+  st_as_sfc() # ... and make it a sf polygon
+
 png(file="Plecoptera",
     width=9, height=7, units="in", res=300)
-tm_shape(plecopteraMap) +
+tm_shape(plecopteraMap2,  bbox = bbox_new) +
   tm_fill(c("N_Species", "N_Occurrences"), 
-          n = 5,
+          n = 4,
           style = "jenks",
           palette = 'Blues') +
   tm_layout(legend.position = c("right", "bottom"),
@@ -1440,19 +2123,36 @@ ephemeroptera_N_OCC =  ephemeroptera_N_SP |>
 
 ## Merge  
 
-ephemeroptera_final = merge(ephemeroptera_N_SP, ephemeroptera_N_OCC, by= "ISO_A2.x")
-
-## Plot N species per country
-
-ephemeropteraMap = st_as_sf(ephemeroptera_final) |> 
+ephemeroptera_final = merge(ephemeroptera_N_SP, ephemeroptera_N_OCC, by= "ISO_A2.x") |> 
   dplyr::rename(N_Species = gbifID.y) |> 
   dplyr::rename(N_Occurrences = freq)
 
+## Plot
+
+ephemeropteraMap = ephemeroptera_final  |> 
+  dplyr::select(ADMIN, N_Species,N_Occurrences)  
+
+ephemeropteraMap2 = cntshp |> 
+  left_join(ephemeropteraMap, by = "ADMIN") #|> 
+#mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
+
+bbox_new = st_bbox(ephemeropteraMap2) 
+xrange = bbox_new$xmax - bbox_new$xmin # range of x values
+yrange = bbox_new$ymax - bbox_new$ymin # range of y values
+
+# bbox_new[1] <- bbox_new[1] - (0.25 * xrange) # xmin - left
+bbox_new[3] <- bbox_new[3] + (0.20 * xrange) # xmax - right
+# bbox_new[2] <- bbox_new[2] - (0.25 * yrange) # ymin - bottom
+bbox_new[4] <- bbox_new[4] + (0.17 * yrange) # ymax - top
+
+bbox_new <- bbox_new %>%  # take the bounding box ...
+  st_as_sfc() # ... and make it a sf polygon
+
 png(file="Ephemeroptera",
     width=9, height=7, units="in", res=300)
-tm_shape(ephemeropteraMap) +
+tm_shape(ephemeropteraMap2,  bbox = bbox_new) +
   tm_fill(c("N_Species", "N_Occurrences"), 
-          n = 5,
+          n = 4,
           style = "jenks",
           palette = 'Blues') +
   tm_layout(legend.position = c("right", "bottom"),
@@ -1532,19 +2232,36 @@ crocodylia_N_OCC =  crocodylia_N_SP |>
 
 ## Merge  
 
-crocodylia_final = merge(crocodylia_N_SP, crocodylia_N_OCC, by= "ISO_A2.x")
-
-## Plot N species per country
-
-crocodyliaMap = st_as_sf(crocodylia_final) |> 
+crocodylia_final = merge(crocodylia_N_SP, crocodylia_N_OCC, by= "ISO_A2.x") |> 
   dplyr::rename(N_Species = gbifID.y) |> 
   dplyr::rename(N_Occurrences = freq)
 
+## Plot
+
+crocodyliaMap = crocodylia_final  |> 
+  dplyr::select(ADMIN, N_Species,N_Occurrences)  
+
+crocodyliaMap2 = cntshp |> 
+  left_join(crocodyliaMap, by = "ADMIN") #|> 
+#mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
+
+bbox_new = st_bbox(crocodyliaMap2) 
+xrange = bbox_new$xmax - bbox_new$xmin # range of x values
+yrange = bbox_new$ymax - bbox_new$ymin # range of y values
+
+# bbox_new[1] <- bbox_new[1] - (0.25 * xrange) # xmin - left
+bbox_new[3] <- bbox_new[3] + (0.20 * xrange) # xmax - right
+# bbox_new[2] <- bbox_new[2] - (0.25 * yrange) # ymin - bottom
+bbox_new[4] <- bbox_new[4] + (0.17 * yrange) # ymax - top
+
+bbox_new <- bbox_new %>%  # take the bounding box ...
+  st_as_sfc() # ... and make it a sf polygon
+
 png(file="Crocodylia",
     width=9, height=7, units="in", res=300)
-tm_shape(crocodyliaMap) +
+tm_shape(crocodyliaMap2,  bbox = bbox_new) +
   tm_fill(c("N_Species", "N_Occurrences"), 
-          n = 5,
+          n = 4,
           style = "jenks",
           palette = 'Blues') +
   tm_layout(legend.position = c("right", "bottom"),
@@ -1555,7 +2272,6 @@ tm_shape(crocodyliaMap) +
 dev.off()
 rm(list = ls())
 .rs.restartR()
-
 
 ## Testudines
 
@@ -1624,19 +2340,36 @@ testudines_N_OCC =  testudines_N_SP |>
 
 ## Merge  
 
-testudines_final = merge(testudines_N_SP, testudines_N_OCC, by= "ISO_A2.x")
-
-## Plot N species per country
-
-testudinesMap = st_as_sf(testudines_final) |> 
+testudines_final = merge(testudines_N_SP, testudines_N_OCC, by= "ISO_A2.x") |> 
   dplyr::rename(N_Species = gbifID.y) |> 
   dplyr::rename(N_Occurrences = freq)
 
+## Plot
+
+testudinesMap = testudines_final  |> 
+  dplyr::select(ADMIN, N_Species,N_Occurrences)  
+
+testudinesMap2 = cntshp |> 
+  left_join(testudinesMap, by = "ADMIN") #|> 
+#mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
+
+bbox_new = st_bbox(testudinesMap2) 
+xrange = bbox_new$xmax - bbox_new$xmin # range of x values
+yrange = bbox_new$ymax - bbox_new$ymin # range of y values
+
+# bbox_new[1] <- bbox_new[1] - (0.25 * xrange) # xmin - left
+bbox_new[3] <- bbox_new[3] + (0.20 * xrange) # xmax - right
+# bbox_new[2] <- bbox_new[2] - (0.25 * yrange) # ymin - bottom
+bbox_new[4] <- bbox_new[4] + (0.17 * yrange) # ymax - top
+
+bbox_new <- bbox_new %>%  # take the bounding box ...
+  st_as_sfc() # ... and make it a sf polygon
+
 png(file="Testudines",
     width=9, height=7, units="in", res=300)
-tm_shape(testudinesMap) +
+tm_shape(testudinesMap2,  bbox = bbox_new) +
   tm_fill(c("N_Species", "N_Occurrences"), 
-          n = 5,
+          n = 4,
           style = "jenks",
           palette = 'Blues') +
   tm_layout(legend.position = c("right", "bottom"),
@@ -1733,8 +2466,8 @@ euglenozoaMap = euglenozoa_final  |>
   dplyr::select(ADMIN, N_Species,N_Occurrences)  
  
 euglenozoaMap2 = cntshp |> 
-  left_join(euglenozoaMap, by = "ADMIN") |> 
-  mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
+  left_join(euglenozoaMap, by = "ADMIN") #|> 
+  #mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
 
 bbox_new = st_bbox(euglenozoaMap2) 
 xrange = bbox_new$xmax - bbox_new$xmin # range of x values
