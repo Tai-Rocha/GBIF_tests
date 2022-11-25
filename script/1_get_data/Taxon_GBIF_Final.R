@@ -1,3 +1,225 @@
+## Rotifera 
+
+library(data.table)
+library(plyr)
+library(dplyr)
+library(raster)
+library(readr)
+library(rgdal)
+library(dplyr)
+library(sf)
+library(sp)
+library(tidyr)
+library(tmap)
+library(tidyverse)
+
+## Read Shape
+
+shpfile = readOGR("data/shape/buffer_hydro_global/b_join_river_country.shp")
+
+countryshp = readOGR("data/shape/ne_10m_admin_0_countries/ne_10m_admin_0_countries.shp")
+
+gbifraw = data.table::fread("data-raw/rotifera/0011303-220831081235567.csv") 
+
+gbif = gbifraw |> 
+  dplyr::as_tibble() |> 
+  dplyr::distinct(decimalLatitude, decimalLongitude, .keep_all = TRUE) |> 
+  dplyr::filter_at(vars(decimalLatitude, decimalLongitude), all_vars(!is.na(.)))
+
+
+
+xy = gbif |> 
+  dplyr::select(decimalLatitude, decimalLongitude) #|> 
+#na.omit()
+
+pts = SpatialPointsDataFrame(coords = xy, data = gbif, proj4string = CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"))
+
+gb = st_as_sf(pts, coords = xy, st_crs(4326)) |> 
+  dplyr::rename(ISO_A2 = countryCode)
+
+shp = st_as_sf(shpfile, st_crs(4326))
+
+good_points = st_filter(gb, shp)
+
+#plot(st_geometry(good_points))
+
+cntshp = st_as_sf(countryshp, st_crs(4326))
+
+rotiferajoin = st_join(cntshp, good_points) |> 
+  as_tibble()
+
+rotifera_n_sp = rotiferajoin |>
+  tidyr::drop_na(c(decimalLatitude, decimalLongitude, species, ISO_A2.x)) |> 
+  dplyr::select(species, ISO_A2.x) |>
+  dplyr::distinct(species, ISO_A2.x) |> 
+  dplyr::group_by(species,ISO_A2.x) #|> 
+#raster::subset(ISO_A2.x != -99) 
+
+rotifera_N_SPP = plyr::count(rotifera_n_sp$ISO_A2.x) 
+rotifera_N_SPP = dplyr::rename(rotifera_N_SPP, ISO_A2.x = x)
+
+rotifera_N_SP = merge(rotiferajoin, rotifera_N_SPP, by= "ISO_A2.x")
+
+## Count occ per country 
+
+rotifera_N_OCC =  rotifera_N_SP |> 
+  dplyr::group_by(ISO_A2.x) |> 
+  dplyr::summarise(gbifID = n()) 
+
+## Merge  
+
+rotifera_final = merge(rotifera_N_SP, rotifera_N_OCC, by= "ISO_A2.x") |> 
+  dplyr::rename(N_Species = gbifID.y) |> 
+  dplyr::rename(N_Occurrences = freq)
+
+## Plot
+
+rotiferaMap = rotifera_final  |> 
+  dplyr::select(ADMIN, N_Species,N_Occurrences)  
+
+rotiferaMap2 = cntshp |> 
+  left_join(rotiferaMap, by = "ADMIN") #|> 
+#mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
+
+bbox_new = st_bbox(rotiferaMap2) 
+xrange = bbox_new$xmax - bbox_new$xmin # range of x values
+yrange = bbox_new$ymax - bbox_new$ymin # range of y values
+
+# bbox_new[1] <- bbox_new[1] - (0.25 * xrange) # xmin - left
+bbox_new[3] <- bbox_new[3] + (0.20 * xrange) # xmax - right
+# bbox_new[2] <- bbox_new[2] - (0.25 * yrange) # ymin - bottom
+bbox_new[4] <- bbox_new[4] + (0.17 * yrange) # ymax - top
+
+bbox_new <- bbox_new %>%  # take the bounding box ...
+  st_as_sfc() # ... and make it a sf polygon
+
+png(file="Rotifera",
+    width=9, height=7, units="in", res=300)
+tm_shape(rotiferaMap2,  bbox = bbox_new) +
+  tm_fill(c("N_Species", "N_Occurrences"), 
+          n = 4,
+          style = "jenks",
+          palette = 'Blues') +
+  tm_layout(legend.position = c("right", "bottom"),
+            main.title = "Rotifera",
+            main.title.position = "centre") +
+  tm_borders(alpha = 0.5)
+
+dev.off()
+rm(list = ls())
+.rs.restartR()
+
+## Odonata 
+
+library(data.table)
+library(plyr)
+library(dplyr)
+library(raster)
+library(readr)
+library(rgdal)
+library(dplyr)
+library(sf)
+library(sp)
+library(tidyr)
+library(tmap)
+library(tidyverse)
+
+## Read Shape
+
+shpfile = readOGR("data/shape/buffer_hydro_global/b_join_river_country.shp")
+
+countryshp = readOGR("data/shape/ne_10m_admin_0_countries/ne_10m_admin_0_countries.shp")
+
+gbifraw = data.table::fread("data-raw/odonata/0011743-220831081235567.csv") 
+
+gbif = gbifraw |> 
+  dplyr::as_tibble() |> 
+  dplyr::distinct(decimalLatitude, decimalLongitude, .keep_all = TRUE) |> 
+  dplyr::filter_at(vars(decimalLatitude, decimalLongitude), all_vars(!is.na(.)))
+
+  
+
+xy = gbif |> 
+  dplyr::select(decimalLatitude, decimalLongitude) #|> 
+  #na.omit()
+
+pts = SpatialPointsDataFrame(coords = xy, data = gbif, proj4string = CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"))
+
+gb = st_as_sf(pts, coords = xy, st_crs(4326)) |> 
+  dplyr::rename(ISO_A2 = countryCode)
+
+shp = st_as_sf(shpfile, st_crs(4326))
+
+good_points = st_filter(gb, shp)
+
+#plot(st_geometry(good_points))
+
+cntshp = st_as_sf(countryshp, st_crs(4326))
+
+odonatajoin = st_join(cntshp, good_points) |> 
+  as_tibble()
+
+odonata_n_sp = odonatajoin |>
+  tidyr::drop_na(c(decimalLatitude, decimalLongitude, species, ISO_A2.x)) |> 
+  dplyr::select(species, ISO_A2.x) |>
+  dplyr::distinct(species, ISO_A2.x) |> 
+  dplyr::group_by(species,ISO_A2.x) #|> 
+#raster::subset(ISO_A2.x != -99) 
+
+odonata_N_SPP = plyr::count(odonata_n_sp$ISO_A2.x) 
+odonata_N_SPP = dplyr::rename(odonata_N_SPP, ISO_A2.x = x)
+
+odonata_N_SP = merge(odonatajoin, odonata_N_SPP, by= "ISO_A2.x")
+
+## Count occ per country 
+
+odonata_N_OCC =  odonata_N_SP |> 
+  dplyr::group_by(ISO_A2.x) |> 
+  dplyr::summarise(gbifID = n()) 
+
+## Merge  
+
+odonata_final = merge(odonata_N_SP, odonata_N_OCC, by= "ISO_A2.x") |> 
+  dplyr::rename(N_Species = gbifID.y) |> 
+  dplyr::rename(N_Occurrences = freq)
+
+## Plot
+
+odonataMap = odonata_final  |> 
+  dplyr::select(ADMIN, N_Species,N_Occurrences)  
+
+odonataMap2 = cntshp |> 
+  left_join(odonataMap, by = "ADMIN") #|> 
+#mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
+
+bbox_new = st_bbox(odonataMap2) 
+xrange = bbox_new$xmax - bbox_new$xmin # range of x values
+yrange = bbox_new$ymax - bbox_new$ymin # range of y values
+
+# bbox_new[1] <- bbox_new[1] - (0.25 * xrange) # xmin - left
+bbox_new[3] <- bbox_new[3] + (0.20 * xrange) # xmax - right
+# bbox_new[2] <- bbox_new[2] - (0.25 * yrange) # ymin - bottom
+bbox_new[4] <- bbox_new[4] + (0.17 * yrange) # ymax - top
+
+bbox_new <- bbox_new %>%  # take the bounding box ...
+  st_as_sfc() # ... and make it a sf polygon
+
+png(file="Odonata",
+    width=9, height=7, units="in", res=300)
+tm_shape(odonataMap2,  bbox = bbox_new) +
+  tm_fill(c("N_Species", "N_Occurrences"), 
+          n = 4,
+          style = "jenks",
+          palette = 'Blues') +
+  tm_layout(legend.position = c("right", "bottom"),
+            main.title = "Odonata",
+            main.title.position = "centre") +
+  tm_borders(alpha = 0.5)
+
+dev.off()
+rm(list = ls())
+.rs.restartR()
+
 ## Bivalvia 
 
 library(data.table)
