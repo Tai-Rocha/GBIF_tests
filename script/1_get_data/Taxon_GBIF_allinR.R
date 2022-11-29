@@ -69,8 +69,8 @@ rotifera_N_OCC =  rotifera_N_SP |>
 ## Merge  
 
 rotifera_final = merge(rotifera_N_SP, rotifera_N_OCC, by= "ISO_A2.x") |> 
-  dplyr::rename(N_Species = gbifID.y) |> 
-  dplyr::rename(N_Occurrences = freq)
+  dplyr::rename(N_Species = freq) |> 
+  dplyr::rename(N_Occurrences = gbifID)
 
 ## Plot
 
@@ -130,29 +130,30 @@ shpfile = readOGR("data/shape/buffer_hydro_global/b_join_river_country.shp")
 
 countryshp = readOGR("data/shape/ne_10m_admin_0_countries/ne_10m_admin_0_countries.shp")
 
-gbifraw = data.table::fread("data-raw/odonata/0011743-220831081235567.csv") 
+gbifraw = st_read("data-raw/odonata/0011743-220831081235567.csv") 
+
 
 gbif = gbifraw |> 
-  dplyr::as_tibble() |> 
-  dplyr::distinct(decimalLatitude, decimalLongitude, .keep_all = TRUE) |> 
-  dplyr::filter_at(vars(decimalLatitude, decimalLongitude), all_vars(!is.na(.)))
-
-  
+  dplyr::as_tibble() |>
+  mutate_at(c("decimalLatitude", "decimalLongitude"), as.numeric) |> 
+  na.omit()
+  #dplyr::filter_at(vars(decimalLatitude, decimalLongitude), all_vars(!is.na(.)))
 
 xy = gbif |> 
-  dplyr::select(decimalLatitude, decimalLongitude) #|> 
-  #na.omit()
-
+  dplyr::select(decimalLatitude, decimalLongitude) 
+  
 pts = SpatialPointsDataFrame(coords = xy, data = gbif, proj4string = CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"))
 
 gb = st_as_sf(pts, coords = xy, st_crs(4326)) |> 
-  dplyr::rename(ISO_A2 = countryCode)
+  dplyr::rename(ISO_A2 = countryCode) |> 
+  sf::st_make_valid() 
 
-shp = st_as_sf(shpfile, st_crs(4326))
+shp = st_as_sf(shpfile, st_crs(4326)) |> 
+  sf::st_make_valid()
 
-good_points = st_filter(gb, shp)
+good_points = st_filter(gb, shp, .predicate = st_intersects)
 
-#plot(st_geometry(good_points))
+plot(st_geometry(good_points))
 
 cntshp = st_as_sf(countryshp, st_crs(4326))
 
@@ -180,15 +181,16 @@ odonata_N_OCC =  odonata_N_SP |>
 ## Merge  
 
 odonata_final = merge(odonata_N_SP, odonata_N_OCC, by= "ISO_A2.x") |> 
-  dplyr::rename(N_Species = gbifID.y) |> 
-  dplyr::rename(N_Occurrences = freq)
+  dplyr::rename(N_Species = freq) |> 
+  dplyr::rename(N_Occurrences = gbifID)
 
 ## Plot
 
 odonataMap = odonata_final  |> 
   dplyr::select(ADMIN, N_Species,N_Occurrences)  
 
-odonataMap2 = cntshp |> 
+odonataMap2 = cntshp |>
+  #dplyr::rename(ADMIN.x = ADMIN) |> 
   left_join(odonataMap, by = "ADMIN") #|> 
 #mutate_at(vars(N_Species:N_Occurrences), ~replace(., is.na(.), 0))
 
@@ -287,8 +289,8 @@ bivalvia_N_OCC =  bivalvia_N_SP |>
 ## Merge  
 
 bivalvia_final = merge(bivalvia_N_SP, bivalvia_N_OCC, by= "ISO_A2.x") |> 
-  dplyr::rename(N_Species = gbifID.y) |> 
-  dplyr::rename(N_Occurrences = freq)
+  dplyr::rename(N_Species = freq) |> 
+  dplyr::rename(N_Occurrences = gbifID)
 
 ## Plot
 
@@ -395,8 +397,8 @@ porifera_N_OCC =  porifera_N_SP |>
 ## Merge  
 
 porifera_final = merge(porifera_N_SP, porifera_N_OCC, by= "ISO_A2.x") |> 
-  dplyr::rename(N_Species = gbifID.y) |> 
-  dplyr::rename(N_Occurrences = freq)
+  dplyr::rename(N_Species = freq) |> 
+  dplyr::rename(N_Occurrences = gbifID)
 
 ## Plot
 
@@ -503,8 +505,8 @@ bryozoa_N_OCC =  bryozoa_N_SP |>
 ## Merge  
 
 bryozoa_final = merge(bryozoa_N_SP, bryozoa_N_OCC, by= "ISO_A2.x") |> 
-  dplyr::rename(N_Species = gbifID.y) |> 
-  dplyr::rename(N_Occurrences = freq)
+  dplyr::rename(N_Species = freq) |> 
+  dplyr::rename(N_Occurrences = gbifID)
 
 ## Plot
 
@@ -612,8 +614,8 @@ cnidaria_N_OCC =  cnidaria_N_SP |>
 ## Merge  
 
 cnidaria_final = merge(cnidaria_N_SP, cnidaria_N_OCC, by= "ISO_A2.x") |> 
-  dplyr::rename(N_Species = gbifID.y) |> 
-  dplyr::rename(N_Occurrences = freq)
+  dplyr::rename(N_Species = freq) |> 
+  dplyr::rename(N_Occurrences = gbifID)
 
 ## Plot
 
@@ -720,8 +722,8 @@ simuliidae_N_OCC =  simuliidae_N_SP |>
 ## Merge  
 
 simuliidae_final = merge(simuliidae_N_SP, simuliidae_N_OCC, by= "ISO_A2.x") |> 
-  dplyr::rename(N_Species = gbifID.y) |> 
-  dplyr::rename(N_Occurrences = freq)
+  dplyr::rename(N_Species = freq) |> 
+  dplyr::rename(N_Occurrences = gbifID)
 
 ## Plot
 
@@ -829,8 +831,8 @@ culicidae_N_OCC =  culicidae_N_SP |>
 ## Merge  
 
 culicidae_final = merge(culicidae_N_SP, culicidae_N_OCC, by= "ISO_A2.x") |> 
-  dplyr::rename(N_Species = gbifID.y) |> 
-  dplyr::rename(N_Occurrences = freq)
+  dplyr::rename(N_Species = freq) |> 
+  dplyr::rename(N_Occurrences = gbifID)
 
 ## Plot
 
@@ -937,8 +939,8 @@ nematoda_N_OCC =  nematoda_N_SP |>
 ## Merge  
 
 nematoda_final = merge(nematoda_N_SP, nematoda_N_OCC, by= "ISO_A2.x") |> 
-  dplyr::rename(N_Species = gbifID.y) |> 
-  dplyr::rename(N_Occurrences = freq)
+  dplyr::rename(N_Species = freq) |> 
+  dplyr::rename(N_Occurrences = gbifID)
 
 ## Plot
 
@@ -1045,8 +1047,8 @@ nematomorpha_N_OCC =  nematomorpha_N_SP |>
 ## Merge  
 
 nematomorpha_final = merge(nematomorpha_N_SP, nematomorpha_N_OCC, by= "ISO_A2.x") |> 
-  dplyr::rename(N_Species = gbifID.y) |> 
-  dplyr::rename(N_Occurrences = freq)
+  dplyr::rename(N_Species = freq) |> 
+  dplyr::rename(N_Occurrences = gbifID)
 
 ## Plot
 
@@ -1153,8 +1155,8 @@ tubellaria_N_OCC =  tubellaria_N_SP |>
 ## Merge  
 
 tubellaria_final = merge(tubellaria_N_SP, tubellaria_N_OCC, by= "ISO_A2.x") |> 
-  dplyr::rename(N_Species = gbifID.y) |> 
-  dplyr::rename(N_Occurrences = freq)
+  dplyr::rename(N_Species = freq) |> 
+  dplyr::rename(N_Occurrences = gbifID)
 
 ## Plot
 
@@ -1261,8 +1263,8 @@ cephalocaridae_N_OCC =  cephalocaridae_N_SP |>
 ## Merge  
 
 cephalocaridae_final = merge(cephalocaridae_N_SP, cephalocaridae_N_OCC, by= "ISO_A2.x") |> 
-  dplyr::rename(N_Species = gbifID.y) |> 
-  dplyr::rename(N_Occurrences = freq)
+  dplyr::rename(N_Species = freq) |> 
+  dplyr::rename(N_Occurrences = gbifID)
 
 ## Plot
 
@@ -1371,8 +1373,8 @@ diplostraca_N_OCC =  diplostraca_N_SP |>
 ## Merge  
 
 diplostraca_final = merge(diplostraca_N_SP, diplostraca_N_OCC, by= "ISO_A2.x") |> 
-  dplyr::rename(N_Species = gbifID.y) |> 
-  dplyr::rename(N_Occurrences = freq)
+  dplyr::rename(N_Species = freq) |> 
+  dplyr::rename(N_Occurrences = gbifID)
 
 ## Plot
 
@@ -1480,8 +1482,8 @@ ostracoda_N_OCC =  ostracoda_N_SP |>
 ## Merge  
 
 ostracoda_final = merge(ostracoda_N_SP, ostracoda_N_OCC, by= "ISO_A2.x") |> 
-  dplyr::rename(N_Species = gbifID.y) |> 
-  dplyr::rename(N_Occurrences = freq)
+  dplyr::rename(N_Species = freq) |> 
+  dplyr::rename(N_Occurrences = gbifID)
 
 ## Plot
 
@@ -1588,8 +1590,8 @@ isopoda_N_OCC =  isopoda_N_SP |>
 ## Merge  
 
 isopoda_final = merge(isopoda_N_SP, isopoda_N_OCC, by= "ISO_A2.x") |> 
-  dplyr::rename(N_Species = gbifID.y) |> 
-  dplyr::rename(N_Occurrences = freq)
+  dplyr::rename(N_Species = freq) |> 
+  dplyr::rename(N_Occurrences = gbifID)
 
 ## Plot
 
@@ -1696,8 +1698,8 @@ maxillopoda_N_OCC =  maxillopoda_N_SP |>
 ## Merge  
 
 maxillopoda_final = merge(maxillopoda_N_SP, maxillopoda_N_OCC, by= "ISO_A2.x") |> 
-  dplyr::rename(N_Species = gbifID.y) |> 
-  dplyr::rename(N_Occurrences = freq)
+  dplyr::rename(N_Species = freq) |> 
+  dplyr::rename(N_Occurrences = gbifID)
 
 ## Plot
 
@@ -1804,8 +1806,8 @@ remipedia_N_OCC =  remipedia_N_SP |>
 ## Merge  
 
 remipedia_final = merge(remipedia_N_SP, remipedia_N_OCC, by= "ISO_A2.x") |> 
-  dplyr::rename(N_Species = gbifID.y) |> 
-  dplyr::rename(N_Occurrences = freq)
+  dplyr::rename(N_Species = freq) |> 
+  dplyr::rename(N_Occurrences = gbifID)
 
 ## Plot
 
@@ -1912,8 +1914,8 @@ megaloptera_N_OCC =  megaloptera_N_SP |>
 ## Merge  
 
 megaloptera_final = merge(megaloptera_N_SP, megaloptera_N_OCC, by= "ISO_A2.x") |> 
-  dplyr::rename(N_Species = gbifID.y) |> 
-  dplyr::rename(N_Occurrences = freq)
+  dplyr::rename(N_Species = freq) |> 
+  dplyr::rename(N_Occurrences = gbifID)
 
 ## Plot
 
@@ -2021,8 +2023,8 @@ trichoptera_N_OCC =  trichoptera_N_SP |>
 ## Merge  
 
 trichoptera_final = merge(trichoptera_N_SP, trichoptera_N_OCC, by= "ISO_A2.x") |> 
-  dplyr::rename(N_Species = gbifID.y) |> 
-  dplyr::rename(N_Occurrences = freq)
+  dplyr::rename(N_Species = freq) |> 
+  dplyr::rename(N_Occurrences = gbifID)
 
 ## Plot
 
@@ -2129,8 +2131,8 @@ hemiptera_N_OCC =  hemiptera_N_SP |>
 ## Merge  
 
 hemiptera_final = merge(hemiptera_N_SP, hemiptera_N_OCC, by= "ISO_A2.x") |> 
-  dplyr::rename(N_Species = gbifID.y) |> 
-  dplyr::rename(N_Occurrences = freq)
+  dplyr::rename(N_Species = freq) |> 
+  dplyr::rename(N_Occurrences = gbifID)
 
 ## Plot
 
@@ -2237,8 +2239,8 @@ plecoptera_N_OCC =  plecoptera_N_SP |>
 ## Merge  
 
 plecoptera_final = merge(plecoptera_N_SP, plecoptera_N_OCC, by= "ISO_A2.x") |> 
-  dplyr::rename(N_Species = gbifID.y) |> 
-  dplyr::rename(N_Occurrences = freq)
+  dplyr::rename(N_Species = freq) |> 
+  dplyr::rename(N_Occurrences = gbifID)
 
 ## Plot
 
@@ -2346,8 +2348,8 @@ ephemeroptera_N_OCC =  ephemeroptera_N_SP |>
 ## Merge  
 
 ephemeroptera_final = merge(ephemeroptera_N_SP, ephemeroptera_N_OCC, by= "ISO_A2.x") |> 
-  dplyr::rename(N_Species = gbifID.y) |> 
-  dplyr::rename(N_Occurrences = freq)
+  dplyr::rename(N_Species = freq) |> 
+  dplyr::rename(N_Occurrences = gbifID)
 
 ## Plot
 
@@ -2455,8 +2457,8 @@ crocodylia_N_OCC =  crocodylia_N_SP |>
 ## Merge  
 
 crocodylia_final = merge(crocodylia_N_SP, crocodylia_N_OCC, by= "ISO_A2.x") |> 
-  dplyr::rename(N_Species = gbifID.y) |> 
-  dplyr::rename(N_Occurrences = freq)
+  dplyr::rename(N_Species = freq) |> 
+  dplyr::rename(N_Occurrences = gbifID)
 
 ## Plot
 
@@ -2563,8 +2565,8 @@ testudines_N_OCC =  testudines_N_SP |>
 ## Merge  
 
 testudines_final = merge(testudines_N_SP, testudines_N_OCC, by= "ISO_A2.x") |> 
-  dplyr::rename(N_Species = gbifID.y) |> 
-  dplyr::rename(N_Occurrences = freq)
+  dplyr::rename(N_Species = freq) |> 
+  dplyr::rename(N_Occurrences = gbifID)
 
 ## Plot
 
@@ -2678,8 +2680,8 @@ euglenozoa_final = merge(euglenozoa_N_SP, euglenozoa_N_OCC, by= "ISO_A2.x")  |>
   #mutate_if(is.numeric, ~replace(., is.na(.), 0)) |> 
   #mutate_if(is.character, ~replace(., is.na(.), 0)) |> 
   #mutate_if(is.numeric, ~replace(., -99, 0))  |> 
-  dplyr::rename(N_Species = gbifID.y) |> 
-  dplyr::rename(N_Occurrences = freq)
+  dplyr::rename(N_Species = freq) |> 
+  dplyr::rename(N_Occurrences = gbifID)
 
 
 ## Plot N species per country
