@@ -1,4 +1,4 @@
-### Aquatics 
+### Freshwater GBFI data
 The idea is to get species and occurrences of freshwater from GBIF 
 ### Workflow of Methods
 ### 1 Species and occurrence survey downloaded from [GBIF]()
