@@ -1,9 +1,20 @@
 ### Aquatics 
-#### The idea is to get species and occurrences of freshwater  from GBIF 
+The idea is to get species and occurrences of freshwater from GBIF 
+### Workflow of Methods
+### 1 Species and occurrence survey downloaded from [GBIF]()
+#### 1.1 Parameters suvery
+- Ocurrences
+- Simple fields 
+- Occurrence status:  Present
+- Scientific name: Group name. Ex.: Odonata
 
-### Workflow
-### 1 merge (join) shape from [world rivers](http://ihp-wins.unesco.org/layers/geonode:world_rivers) with [countri shape](https://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-0-countries/)
-#### 2 Create a buffer (10 km left, 10 km right) around line (rivers) of shape 
-### 2 Get occurence inside shape
-### 3 Count occs per country
+### 2 Vector data built to select freshwater only occurrences
+- Merging [world rivers](http://ihp-wins.unesco.org/layers/geonode:world_rivers) and  [countri shape](https://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-0-countries/) to identify  rivers by country 
+- Create a buffer (10 km left, 10 km right) around line (rivers). Final shapefile available [here]() 
+
+### 3 Select records inside the vector cretated (Final shapefile - step 2)  
+- Using latitude and longitude 
+- predicated : intesertc and are_within 
+
+### 3 Count Species and Ocuurence per Country
 
